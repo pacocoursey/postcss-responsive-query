@@ -1,0 +1,31 @@
+{
+  "name": "postcss-responsive-query",
+  "version": "0.0.2",
+  "main": "./index.js",
+  "description": "PostCSS plugin that automatically expands rules into media queries",
+  "keywords": [
+    "postcss",
+    "css",
+    "postcss-plugin",
+    "responsive"
+  ],
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "pacocoursey",
+  "license": "MIT",
+  "repository": "pacocoursey/postcss-responsive-query",
+  "dependencies": {
+    "postcss": "^7.0.18"
+  },
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "jest": "^24.9.0"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
