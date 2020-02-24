@@ -1,6 +1,6 @@
 # PostCSS Responsive Query
 
-[PostCSS] plugin that automatically expands rules into media queries.
+[PostCSS](https://postcss.org/) plugin that automatically expands rules into media queries.
 
 Input:
 
