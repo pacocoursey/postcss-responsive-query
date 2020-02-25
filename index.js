@@ -1,8 +1,16 @@
 const postcss = require("postcss");
 
-const create = (oldRule, name) => {
+const create = (oldRule, selectors, name) => {
   const rule = oldRule.clone();
-  rule.selector = `${oldRule.selector}${name ? `-${name}` : ""}`;
+
+  if (selectors) {
+    for (const selector of selectors) {
+      rule.selector = rule.selector.replace(selector, selector + `-${name}`);
+    }
+    rule.selector = rule.selector;
+  } else {
+    rule.selector = `${rule.selector}${name ? `-${name}` : ""}`;
+  }
   return rule;
 };
 
@@ -20,7 +28,7 @@ module.exports = postcss.plugin("postcss-responsive-query", (opts = {}) => {
     throw new Error("Breakpoints must be specified in the plugin options");
   }
 
-  return root => {
+  return (root, result) => {
     const hasResponsiveAtRule = root.some(
       rule => rule.type === "atrule" && rule.name === "responsive"
     );
@@ -50,6 +58,23 @@ module.exports = postcss.plugin("postcss-responsive-query", (opts = {}) => {
     });
 
     root.walkAtRules("responsive", atRule => {
+      const selectors = atRule.params
+        ? atRule.params
+            .replace("(", "")
+            .replace(")", "")
+            .split(",")
+            .map(s => s.trim())
+        : null;
+
+      if (selectors && selectors.some(s => !s.startsWith("."))) {
+        throw atRule.error(
+          `Non-class rule specified in @responsive rule parameters: "${atRule.params}"`,
+          {
+            plugin: "postcss-responsive-query"
+          }
+        );
+      }
+
       atRule.walkRules(rule => {
         if (!rule.selector.startsWith(".")) {
           throw atRule.error(
@@ -60,8 +85,21 @@ module.exports = postcss.plugin("postcss-responsive-query", (opts = {}) => {
           );
         }
 
+        if (selectors) {
+          const hasMatch = selectors.some(s => rule.selector.includes(s));
+
+          // No matching rules in this @responsive rule, move on
+          if (!hasMatch) {
+            rule.warn(
+              result,
+              `Rule with selector "${rule.selectors}" is invalid under responsive query "${atRule.params}"`
+            );
+            return;
+          }
+        }
+
         Object.keys(breakpoints).forEach((bpName, i) => {
-          rules[i].append(create(rule, bpName));
+          rules[i].append(create(rule, selectors, bpName));
         });
       });
 

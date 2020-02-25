@@ -2,9 +2,35 @@
 
 [PostCSS](https://postcss.org/) plugin that automatically expands rules into media queries.
 
-Input:
+
+## Install
+
+```bash
+$ yarn add postcss-responsive-query -D
+# or
+$ npm install post-css-responsive-query --save-dev
+```
+
+## Configuration
+
+This plugin requires a `breakpoints` object in options:
+
+```js
+breakpoints: {
+  mobile: '(max-width: 600px)',
+  tablet: '(max-width: 960px) and (min-width: 600px)',
+  desktop: '(min-width: 961px)'
+}
+```
+
+These keys are used as suffixes for the generated classnames, as shown in the example below.
+
+## Usage
+
+Rules inside of a responsive query will be duplicated into the media queries you specify with a suffix you specify appended to the classname:
 
 ```css
+/* Input */
 @responsive {
   .foo {
     color: red;
@@ -12,9 +38,8 @@ Input:
 }
 ```
 
-Output:
-
 ```css
+/* Output */
 @media (max-width: 600px) {
   .foo-mobile {
     color: red;
@@ -34,19 +59,49 @@ Output:
 }
 ```
 
-## Configuration
+**Only class selectors are allowed inside responsive queries.** The following will throw an error:
 
-This plugin requires a `breakpoints` object in options:
-
-```js
-breakpoints: {
-  mobile: '(max-width: 600px)',
-  tablet: '(max-width: 960px) and (min-width: 600px)',
-  desktop: '(min-width: 961px)'
+```css
+@responsive {
+  /* ERROR, not a class selector */
+  div {
+    color: red;
+  }
 }
 ```
 
-These keys are used as suffixes for the generated classnames, as shown in the example above.
+### Responsive Query Parameters
+
+You can pass parameters to the responsive query to indicate what classnames to transform:
+
+```css
+/* Input */
+@responsive (.bar) {
+  .foo.bar + .biz {
+    color: red;
+  }
+}
+```
+
+```css
+/* Output */
+@media (max-width: 600px) {
+  .foo.bar-mobile + .biz { /* .foo and .biz classnames are untouched */
+    color: red;
+  }
+}
+
+/* ... */
+```
+
+Just like above, you should only use **class selectors inside responsive query parameters**:
+
+```css
+/* ERROR, not a class selector */
+@responsive (div) {
+  /* ... */
+}
+```
 
 ## Usage with Next.js
 
