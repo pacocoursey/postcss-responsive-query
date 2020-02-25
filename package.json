@@ -1,6 +1,6 @@
 {
   "name": "postcss-responsive-query",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "./index.js",
   "description": "PostCSS plugin that automatically expands rules into media queries",
   "keywords": [
